@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albania Trip Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #f5efe6;
+    --clay: #c4956a;
+    --terracotta: #b85c38;
+    --deep: #1a1a2e;
+    --slate: #2d3561;
+    --water: #4a9eba;
+    --mint: #7ec8c8;
+    --cream: #faf7f2;
+    --text: #2a2a2a;
+    --muted: #8a8a8a;
+    --border: rgba(196,149,106,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, var(--slate) 0%, var(--deep) 60%, #16213e 100%);
+    padding: 48px 24px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(74,158,186,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(196,149,106,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .flag { font-size: 28px; margin-bottom: 8px; display: block; }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+
+  .hero h1 span {
+    color: var(--clay);
+    font-style: italic;
+  }
+
+  .hero-dates {
+    margin-top: 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--deep);
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab.active {
+    color: var(--clay);
+    border-bottom-color: var(--clay);
+  }
+
+  .tab:hover { color: rgba(255,255,255,0.7); }
+
+  .section {
+    display: none;
+    padding: 24px 20px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--deep);
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+  }
+
+  /* PACKING */
+  .pack-category {
+    margin-bottom: 28px;
+  }
+
+  .pack-category-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pack-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .pack-item:last-child { border-bottom: none; }
+
+  .pack-item.checked { opacity: 0.45; }
+
+  .pack-item.checked .pack-name { text-decoration: line-through; }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--clay);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .pack-item.checked .checkbox {
+    background: var(--clay);
+    border-color: var(--clay);
+  }
+
+  .checkmark {
+    display: none;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .pack-item.checked .checkmark { display: block; }
+
+  .pack-name {
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .pack-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .pack-weather {
+    font-size: 10px;
+    background: var(--water);
+    color: white;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .pack-progress {
+    background: rgba(196,149,106,0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(196,149,106,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--clay), var(--terracotta));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 12px;
+    color: var(--clay);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* DAILY ITINERARY */
+  .day-card {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+  }
+
+  .day-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .day-emoji {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .day-info { flex: 1; }
+
+  .day-date {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .day-location {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--deep);
+    margin-top: 1px;
+  }
+
+  .day-chevron {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  .day-card.open .day-chevron { transform: rotate(180deg); }
+
+  .day-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .day-card.open .day-body { display: block; }
+
+  .activity {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .activity:last-child { border-bottom: none; }
+
+  .activity-time {
+    font-size: 11px;
+    color: var(--clay);
+    font-weight: 500;
+    min-width: 52px;
+    padding-top: 1px;
+    letter-spacing: 0.3px;
+  }
+
+  .activity-content { flex: 1; }
+
+  .activity-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .activity-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  .activity-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-beach { background: rgba(74,158,186,0.12); color: var(--water); }
+  .tag-culture { background: rgba(196,149,106,0.12); color: var(--clay); }
+  .tag-nature { background: rgba(126,200,200,0.15); color: #3a9090; }
+  .tag-food { background: rgba(184,92,56,0.1); color: var(--terracotta); }
+  .tag-travel { background: rgba(45,53,97,0.1); color: var(--slate); }
+
+  /* TRAVEL ITINERARY */
+  .travel-day {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  .travel-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .travel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--clay);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--clay);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .travel-connector {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(to bottom, var(--clay), rgba(196,149,106,0.2));
+    margin: 4px 0;
+    min-height: 30px;
+  }
+
+  .travel-content {
+    flex: 1;
+    padding-bottom: 24px;
+  }
+
+  .travel-date {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .travel-dest {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--deep);
+  }
+
+  .travel-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .travel-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    background: rgba(45,53,97,0.08);
+    color: var(--slate);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* HOTELS */
+  .hotel-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hotel-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--clay), var(--terracotta));
+  }
+
+  .hotel-booked {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 12px;
+    background: white;
+  }
+
+  .hotel-booked.booked {
+    background: #4caf50;
+    border-color: #4caf50;
+    color: white;
+  }
+
+  .hotel-dates {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--clay);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .hotel-city {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .hotel-name {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--deep);
+    margin-bottom: 4px;
+    padding-right: 32px;
+  }
+
+  .hotel-price {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .hotel-price span {
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  .hotel-backup {
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(0,0,0,0.03);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .hotel-backup strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .book-btn {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--clay);
+    text-decoration: none;
+    border: 1px solid var(--clay);
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .book-btn:hover {
+    background: var(--clay);
+    color: white;
+  }
+
+  .hotel-stats {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .hotel-stat {
+    font-size: 10px;
+    background: rgba(196,149,106,0.08);
+    color: var(--clay);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .urgency {
+    font-size: 10px;
+    color: var(--terracotta);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .booking-summary {
+    background: linear-gradient(135deg, var(--slate), var(--deep));
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .booking-summary h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 10px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .summary-item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .summary-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 3px;
+  }
+
+  .summary-value {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .summary-value.green { color: #7ed56f; }
+  .summary-value.clay { color: var(--clay); }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid rgba(196,149,106,0.3);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .reset-btn:hover { border-color: var(--clay); color: var(--clay); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="flag">🇮🇹🇦🇱</span>
+  <h1>Rome & <span>Albania</span></h1>
+  <div class="hero-dates">June 6 – 17, 2026 &nbsp;·&nbsp; Solo Female Travel</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('summary')">🗺️ Summary</button>
+  <button class="tab" onclick="showTab('packing')">🧳 Packing</button>
+  <button class="tab" onclick="showTab('itinerary')">📅 Itinerary</button>
+</div>
+
+<!-- SUMMARY -->
+<div id="summary" class="section active">
+  <div class="section-title">Trip Summary</div>
+  <div class="section-subtitle">Rome & Albania · June 6–17, 2026 · Solo Female Travel</div>
+
+  <div style="margin-bottom:24px;">
+    <div style="background:linear-gradient(135deg,var(--slate),var(--deep));border-radius:16px;padding:20px 24px;color:white;margin-bottom:16px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:16px;">Your Itinerary at a Glance</div>
+      <div id="summaryStops"></div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,var(--clay),var(--terracotta));border-radius:16px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Estimated Total Trip Cost</div>
+        <div style="font-size:32px;font-weight:600;color:white;">~$2,976</div>
+      </div>
+      <div style="font-size:36px;">🌍</div>
+    </div>
+
+    <div style="background:white;border-radius:16px;padding:18px 20px;border:1px solid var(--border);">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--clay);font-weight:500;margin-bottom:12px;">Share Itinerary</div>
+      <div id="copyText" style="font-size:13px;line-height:2;color:var(--text);background:var(--cream);padding:16px;border-radius:10px;margin-bottom:12px;white-space:pre-wrap;">✈️ Jun 6–8: Rome
+✈️ Jun 8: Fly Rome → Tirana (9:55)
+🏰 Jun 8–11: Berat (3 nights)
+🌊 Jun 11–15: Himare (4 nights)
+Day trips: Gjirokaster + Dhermi/Gjipe Beach + Corfu 🇬🇷 + Blue Eye + Butrint
+🏙️ Jun 15–16: Tirana (1 night)
+✈️ Jun 16: Fly Tirana → Rome (14:40)
+🇮🇹 Jun 16–17: Rome (1 night)
+✈️ Jun 17: Fly home to NYC (19:05)</div>
+      <button onclick="copyItinerary()" id="copyBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--slate),var(--deep));color:white;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;">📋 Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- PACKING -->
+<div id="packing" class="section">
+  <div class="section-title">What to Pack</div>
+  <div class="section-subtitle">Curated for June heat, beach days & historic towns</div>
+
+  <div class="pack-progress">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">0 / 0 packed</div>
+  </div>
+
+  <div class="pack-category">
+    <div class="pack-category-title">👗 Outfits — Daytime</div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Linen wide-leg trousers (2 pairs)</div><div class="pack-note">Breezy for hot towns, respectful for UNESCO sites</div></div>
+      <span class="pack-weather">85°F+</span>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Flowy midi dress (2)</div><div class="pack-note">Castle tours + beach towns, elevated effortless look</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Lightweight shorts (2)</div><div class="pack-note">Beach days and casual town exploring</div></div>
+      <span class="pack-weather">Beach</span>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Loose linen blouses / tanks (4)</div><div class="pack-note">Mix and match with everything, quick dry</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">One light layer / kimono</div><div class="pack-note">Evening breeze, air conditioned restaurants</div></div>
+    </div>
+  </div>
+
+  <div class="pack-category">
+    <div class="pack-category-title">🌊 Beach Outfits</div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Swimsuits (3)</div><div class="pack-note">One piece + two bikinis, rotate across Dhermi, Himare & Ksamil</div></div>
+      <span class="pack-weather">Beach</span>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Swimsuit cover-up (2)</div><div class="pack-note">Beach to restaurant without changing</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Rash guard / UV shirt</div><div class="pack-note">Gjipe Beach canyon hike + Shala River swim</div></div>
+    </div>
+  </div>
+
+  <div class="pack-category">
+    <div class="pack-category-title">🌙 Evening Outfits</div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">One elevated dinner outfit</div><div class="pack-note">Trastevere terrace in Rome, old town dinners in Gjirokaster</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Casual evening dress</div><div class="pack-note">Convertible from day to evening</div></div>
+    </div>
+  </div>
+
+  <div class="pack-category">
+    <div class="pack-category-title">👟 Shoes</div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Sturdy walking sandals</div><div class="pack-note">Cobblestone streets in Berat, Gjirokaster UNESCO old towns</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Trail / sport sandals (e.g. Tevas or Chacos)</div><div class="pack-note">Gjipe Beach canyon hike, rocky beaches</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Flip flops</div><div class="pack-note">Beach to pool</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">One pair strappy flats or low heel</div><div class="pack-note">Rome evenings, nicer dinners</div></div>
+    </div>
+  </div>
+
+  <div class="pack-category">
+    <div class="pack-category-title">🧴 Essentials</div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">High SPF sunscreen (lots)</div><div class="pack-note">Albanian sun is intense in June, reapply constantly</div></div>
+      <span class="pack-weather">85°F+</span>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Wide brim hat</div><div class="pack-note">Non-negotiable for beach and driving days</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Quality sunglasses</div><div class="pack-note">Polarized for water reflection at Ksamil & Bovilla</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Lightweight crossbody bag</div><div class="pack-note">Hands-free for town walking, anti-theft style preferred</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Small dry bag / waterproof pouch</div><div class="pack-note">Shala River swim, Gjipe Beach hike</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Plug adapter (Type C — Europe)</div><div class="pack-note">Works for both Italy and Albania</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Portable phone charger / power bank</div><div class="pack-note">Guesthouse power can be unreliable in Theth area</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Small first aid kit + blister pads</div><div class="pack-note">Cobblestone streets are beautiful but brutal</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Reusable water bottle</div><div class="pack-note">Stay hydrated in the heat, reduce plastic</div></div>
+    </div>
+    <div class="pack-item" onclick="togglePack(this)">
+      <div class="checkbox"><span class="checkmark">✓</span></div>
+      <div><div class="pack-name">Light scarf / sarong</div><div class="pack-note">Beach cover, shoulder cover for churches, picnic blanket</div></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetPacking()">Reset all items</button>
+</div>
+
+<!-- DAILY ITINERARY -->
+<div id="itinerary" class="section">
+  <div class="section-title">Itinerary</div>
+  <div class="section-subtitle">Tap any day to expand activities</div>
+  <div id="itineraryTimeline"></div>
+</div>
+
+<!-- TRAVEL_PLACEHOLDER -->
+<div id="travel_removed" style="display:none">
+  <div class="section-title">Travel Route</div>
+  <div class="section-subtitle">Destinations, transport & drive times</div>
+
+  <div style="background:white;border-radius:16px;overflow:hidden;margin-bottom:24px;border:1px solid rgba(196,149,106,0.2);box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:16px;">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#c4956a;font-weight:500;margin-bottom:12px;">Route Map</div>
+    <svg viewBox="0 0 360 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+      <!-- Background -->
+      <rect width="360" height="400" fill="#f0f4f8" rx="12"/>
+
+      <!-- Subtle grid -->
+      <g stroke="#dde3ea" stroke-width="0.5" opacity="0.6">
+        <line x1="0" y1="80" x2="360" y2="80"/>
+        <line x1="0" y1="160" x2="360" y2="160"/>
+        <line x1="0" y1="240" x2="360" y2="240"/>
+        <line x1="0" y1="320" x2="360" y2="320"/>
+        <line x1="72" y1="0" x2="72" y2="400"/>
+        <line x1="144" y1="0" x2="144" y2="400"/>
+        <line x1="216" y1="0" x2="216" y2="400"/>
+        <line x1="288" y1="0" x2="288" y2="400"/>
+      </g>
+
+      <!-- Country label areas -->
+      <text x="52" y="96" font-size="9" fill="#b0bcc8" font-family="sans-serif" letter-spacing="1">ITALY</text>
+      <text x="200" y="96" font-size="9" fill="#b0bcc8" font-family="sans-serif" letter-spacing="1">ALBANIA</text>
+
+      <!-- Adriatic Sea label -->
+      <text x="128" y="220" font-size="8" fill="#a8bfd0" font-family="sans-serif" font-style="italic">Adriatic Sea</text>
+      <text x="118" y="290" font-size="8" fill="#a8bfd0" font-family="sans-serif" font-style="italic">Ionian Sea</text>
+
+      <!--
+        Approximate coords mapped to SVG space:
+        Rome:        lat 41.89, lng 12.51  → x≈52,  y≈108
+        Tirana:      lat 41.33, lng 19.82  → x≈242, y≈122
+        Berat:       lat 40.70, lng 19.95  → x≈246, y≈168
+        Gjirokaster: lat 40.08, lng 20.14  → x≈252, y≈208
+        Dhermi:      lat 40.12, lng 19.61  → x≈236, y≈204
+        Himare:      lat 40.10, lng 19.75  → x≈240, y≈208
+        Ksamil:      lat 39.76, lng 19.99  → x≈248, y≈228
+      -->
+
+      <!-- Flight arc Rome to Tirana -->
+      <path d="M 72 118 Q 158 70 232 126" fill="none" stroke="#2d3561" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+      <!-- Arrow at Tirana end -->
+      <polygon points="232,126 224,120 226,130" fill="#2d3561" opacity="0.5"/>
+
+      <!-- Driving route Albania south -->
+      <polyline points="232,126 238,168 244,210 230,208 232,212 240,230" fill="none" stroke="#c4956a" stroke-width="2" stroke-dasharray="4,3" opacity="0.7"/>
+
+      <!-- Flight arc Ksamil/Tirana back to Rome -->
+      <path d="M 232,126 Q 158 70 72 118" fill="none" stroke="#b85c38" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.35"/>
+
+      <!-- STOP 1: Rome -->
+      <circle cx="72" cy="118" r="14" fill="#b85c38" opacity="0.15"/>
+      <circle cx="72" cy="118" r="10" fill="#b85c38"/>
+      <text x="72" y="122" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">1</text>
+      <text x="72" y="140" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" text-anchor="middle" font-weight="600">Rome</text>
+      <text x="72" y="150" font-size="7" fill="#8a8a8a" font-family="sans-serif" text-anchor="middle">Jun 6–8</text>
+
+      <!-- STOP 2: Tirana (arrival transit) -->
+      <circle cx="232" cy="118" r="14" fill="#2d3561" opacity="0.15"/>
+      <circle cx="232" cy="118" r="10" fill="#2d3561"/>
+      <text x="232" y="122" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">2</text>
+      <text x="260" y="115" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" font-weight="600">Tirana</text>
+      <text x="260" y="125" font-size="7" fill="#8a8a8a" font-family="sans-serif">Jun 9 arrival</text>
+
+      <!-- STOP 3: Berat -->
+      <circle cx="238" cy="168" r="14" fill="#c4956a" opacity="0.15"/>
+      <circle cx="238" cy="168" r="10" fill="#c4956a"/>
+      <text x="238" y="172" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">3</text>
+      <text x="262" y="165" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" font-weight="600">Berat</text>
+      <text x="262" y="175" font-size="7" fill="#8a8a8a" font-family="sans-serif">Jun 9–11</text>
+
+      <!-- STOP 4: Gjirokaster -->
+      <circle cx="244" cy="208" r="14" fill="#c4956a" opacity="0.15"/>
+      <circle cx="244" cy="208" r="10" fill="#c4956a"/>
+      <text x="244" y="212" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">4</text>
+      <text x="262" y="205" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" font-weight="600">Gjirokaster</text>
+      <text x="262" y="215" font-size="7" fill="#8a8a8a" font-family="sans-serif">Jun 11–12</text>
+
+      <!-- STOP 5: Dhermi -->
+      <circle cx="210" cy="220" r="14" fill="#4a9eba" opacity="0.15"/>
+      <circle cx="210" cy="220" r="10" fill="#4a9eba"/>
+      <text x="210" y="224" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">5</text>
+      <text x="152" y="218" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" font-weight="600" text-anchor="end">Dhermi</text>
+      <text x="152" y="228" font-size="7" fill="#8a8a8a" font-family="sans-serif" text-anchor="end">Jun 12–13</text>
+
+      <!-- STOP 6: Himare — 3 night beach base -->
+      <circle cx="218" cy="248" r="18" fill="#4a9eba" opacity="0.2"/>
+      <circle cx="218" cy="248" r="12" fill="#4a9eba"/>
+      <text x="218" y="252" font-size="10" fill="white" font-weight="bold" font-family="sans-serif" text-anchor="middle">6</text>
+      <text x="152" y="244" font-size="8.5" fill="#1a1a2e" font-family="sans-serif" font-weight="600" text-anchor="end">Himare</text>
+      <text x="152" y="254" font-size="7" fill="#8a8a8a" font-family="sans-serif" text-anchor="end">Jun 13–16 ⭐</text>
+      <text x="152" y="263" font-size="7" fill="#4a9eba" font-family="sans-serif" text-anchor="end">3 nights · beach base</text>
+
+      <!-- Drive line Himare back to Tirana -->
+      <path d="M 218 236 Q 225 180 232 142" fill="none" stroke="#2d3561" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+
+      <!-- Drive connectors visible lines -->
+      <line x1="232" y1="128" x2="238" y2="158" stroke="#c4956a" stroke-width="1.5" opacity="0.4"/>
+      <line x1="238" y1="178" x2="244" y2="198" stroke="#c4956a" stroke-width="1.5" opacity="0.4"/>
+      <line x1="244" y1="218" x2="218" y2="230" stroke="#4a9eba" stroke-width="1.5" opacity="0.4"/>
+      <line x1="218" y1="258" x2="232" y2="142" stroke="#2d3561" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.35"/>
+
+      <!-- Flight arc Tirana back to Rome -->
+      <path d="M 232,152 Q 158 80 72 118" fill="none" stroke="#b85c38" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.35"/>
+
+      <!-- Legend -->
+      <rect x="10" y="340" width="340" height="52" rx="8" fill="white" opacity="0.8"/>
+      <circle cx="26" cy="355" r="5" fill="#b85c38"/>
+      <text x="35" y="359" font-size="8" fill="#444" font-family="sans-serif">Rome</text>
+      <circle cx="26" cy="372" r="5" fill="#2d3561"/>
+      <text x="35" y="376" font-size="8" fill="#444" font-family="sans-serif">Transit</text>
+      <circle cx="90" cy="355" r="5" fill="#c4956a"/>
+      <text x="99" y="359" font-size="8" fill="#444" font-family="sans-serif">Historic towns</text>
+      <circle cx="90" cy="372" r="5" fill="#4a9eba"/>
+      <text x="99" y="376" font-size="8" fill="#444" font-family="sans-serif">Beach riviera</text>
+      <line x1="198" y1="355" x2="218" y2="355" stroke="#2d3561" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="222" y="359" font-size="8" fill="#444" font-family="sans-serif">Flight</text>
+      <line x1="198" y1="372" x2="218" y2="372" stroke="#c4956a" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="222" y="376" font-size="8" fill="#444" font-family="sans-serif">Drive</text>
+    </svg>
+  </div>
+
+</div>
+
+<!-- HOTELS -->
+<div id="hotels" class="section">
+  <div class="section-title">Hotels to Book</div>
+  <div class="section-subtitle">Tap the circle to mark as booked</div>
+
+  <div class="booking-summary">
+    <h3>Booking Progress</h3>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">Booked</div>
+        <div class="summary-value green" id="bookedCount">0 / 5</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Est. Total</div>
+        <div class="summary-value clay">~$855</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Avg / night</div>
+        <div class="summary-value">~$95</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Nights</div>
+        <div class="summary-value">9 nights</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hotelCards"></div>
+</div>
+
+<script>
+// TAB SWITCHING
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + id + "'")) {
+      t.classList.add('active');
+    }
+  });
+}
+
+// PACKING
+function togglePack(el) {
+  el.classList.toggle('checked');
+  updateProgress();
+  saveState();
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('.pack-item');
+  const checked = document.querySelectorAll('.pack-item.checked');
+  const pct = items.length ? (checked.length / items.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = checked.length + ' / ' + items.length + ' packed';
+}
+
+function resetPacking() {
+  document.querySelectorAll('.pack-item').forEach(i => i.classList.remove('checked'));
+  updateProgress();
+  saveState();
+}
+
+// DAILY DATA
+const days = [
+  {
+    date: 'Sat Jun 6', location: 'New York → Rome', emoji: '✈️',
+    activities: [
+      { time: '12:30am', name: 'Depart JFK', desc: 'Overnight flight to Rome FCO — direct, 8hrs', tag: 'travel' },
+      { time: '2:30pm', name: 'Arrive Rome FCO', desc: 'Check in to Airbnb, Via di Sant Erasmo, Aventine Hill', tag: 'travel' },
+      { time: 'Evening', name: 'Trastevere wander', desc: 'Dinner at a local trattoria, explore the cobblestone streets', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Sun Jun 7', location: 'Rome', emoji: '🏛️',
+    activities: [
+      { time: 'Morning', name: 'Aventine Hill morning', desc: 'Orange Garden viewpoint, Knights of Malta keyhole, slow espresso', tag: 'culture' },
+      { time: 'Afternoon', name: 'Neighborhood exploring', desc: 'Trastevere, Campo de\'Fiori, Piazza Navona walk', tag: 'culture' },
+      { time: 'Evening', name: 'Aperitivo in Trastevere', desc: 'Local wine bar, aperitivo hour, dinner at a neighbourhood trattoria', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Mon Jun 8', location: 'Rome → Tirana → Berat', emoji: '✈️',
+    activities: [
+      { time: '6:20am', name: 'Taxi to Rome FCO', desc: 'Pre-book the night before — ~45 min from Aventine Hill to FCO', tag: 'travel' },
+      { time: '8:20am', name: 'Fly Rome FCO → Tirana TIA', desc: 'Wizz Air W4 5012, 1hr 35min direct. Pick up rental car on arrival.', tag: 'travel' },
+      { time: '9:55am', name: 'Pick up rental car at TIA', desc: 'Drive straight south — skip Tirana entirely', tag: 'travel' },
+      { time: 'Midday', name: 'Drive to Berat', desc: '~1.5 hrs south — arrive lunchtime with full afternoon ahead', tag: 'travel' },
+      { time: 'Afternoon', name: 'Arrive Berat', desc: 'Check in, wander the old town, get oriented', tag: 'culture' },
+      { time: 'Evening', name: 'Dinner in Berat', desc: 'Riverside restaurant on the Osum, local wine, easy first night', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Tue Jun 9', location: 'Berat', emoji: '🏰',
+    activities: [
+      { time: 'Morning', name: 'Berat Castle', desc: 'Hilltop UNESCO fortress — panoramic views over the City of a Thousand Windows', tag: 'culture' },
+      { time: 'Midday', name: 'Mangalem Quarter', desc: 'Wander the Ottoman neighbourhood, photograph the iconic layered windows', tag: 'culture' },
+      { time: 'Afternoon', name: 'Onufri Museum', desc: 'Inside the castle walls — iconic Albanian religious art', tag: 'culture' },
+      { time: 'Evening', name: 'Riverside dinner', desc: 'Osum River waterfront restaurants, local wine', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Wed Jun 10', location: 'Berat — Day Trip: Apollonia Ruins', emoji: '🏺',
+    activities: [
+      { time: 'Morning', name: 'Drive to Apollonia', desc: '~45 min drive — ancient Greek city, one of the best preserved in the Balkans', tag: 'culture' },
+      { time: 'Midday', name: 'Explore Apollonia', desc: 'Walk the ruins, monastery, hilltop views — very popular and well trodden', tag: 'culture' },
+      { time: 'Afternoon', name: 'Back to Berat', desc: '~45 min drive back — coffee in the old town', tag: 'travel' },
+      { time: 'Evening', name: 'Sunset from castle walls', desc: 'Best golden hour view in all of Albania', tag: 'nature' },
+    ]
+  },
+  {
+    date: 'Thu Jun 11', location: 'Berat → Himare', emoji: '🌊',
+    activities: [
+      { time: 'Morning', name: 'Drive to Himare', desc: '~2 hrs south — stunning coastal drive, Albanian Riviera begins', tag: 'travel' },
+      { time: 'Midday', name: 'Arrive Himare, check in', desc: 'Drop bags, straight to the beach', tag: 'beach' },
+      { time: 'Afternoon', name: 'Spille Beach + Bay of Aquarium', desc: 'Crystal clear Ionian water, hidden cove so clear you see every pebble', tag: 'beach' },
+      { time: 'Evening', name: 'Fresh fish dinner', desc: 'Himare seafront restaurants, grilled sea bream, local wine', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Fri Jun 12', location: 'Himare — Day Trip: Corfu 🇬🇷', emoji: '⛴️',
+    activities: [
+      { time: 'Morning', name: 'Ferry Himare → Corfu', desc: '~1 hr ferry — Finikas Lines or Ionian Seaways, book in advance at omio.com. Bring passport.', tag: 'travel' },
+      { time: 'Midday', name: 'Corfu Old Town', desc: 'UNESCO Venetian old town, narrow alleys, pastel buildings — stunning', tag: 'culture' },
+      { time: 'Afternoon', name: 'Explore Corfu', desc: 'Walk the Old Fortress, lunch at a waterfront taverna, browse the arcaded Liston', tag: 'beach' },
+      { time: 'Evening', name: 'Ferry back to Himare', desc: '~1 hr return crossing, back in Himare for dinner', tag: 'travel' },
+    ]
+  },
+  {
+    date: 'Sat Jun 13', location: 'Himare — Day Trip: Dhermi + Gjipe Beach', emoji: '🏝️',
+    activities: [
+      { time: 'Morning', name: 'Drive to Dhermi', desc: '~30 min north along the riviera — clifftop beach village', tag: 'travel' },
+      { time: 'Midday', name: 'Gjipe Beach canyon hike', desc: '20 min canyon trail — heavy foot traffic in June, perfectly safe solo', tag: 'nature' },
+      { time: 'Afternoon', name: 'Dhermi Beach', desc: 'Crystal clear water, residential vibe, real riviera life', tag: 'beach' },
+      { time: 'Evening', name: 'Drive back to Himare', desc: '~30 min — Porto Palermo castle viewpoint on the way', tag: 'travel' },
+    ]
+  },
+  {
+    date: 'Sun Jun 14', location: 'Himare — Day Trip: Blue Eye + Butrint', emoji: '💙',
+    activities: [
+      { time: 'Morning', name: 'Drive to Blue Eye (Syri i Kalter)', desc: '~1 hr drive south via Saranda — impossibly blue natural spring, unmissable', tag: 'nature' },
+      { time: 'Midday', name: 'Butrint National Park', desc: '~20 min from Blue Eye — UNESCO ruins on a lake, ancient theater, Roman baths', tag: 'culture' },
+      { time: 'Afternoon', name: 'Drive back to Himare', desc: '~1 hr — quick swim at Ksamil beach on the way back if time allows', tag: 'travel' },
+      { time: 'Evening', name: 'Final riviera dinner', desc: 'Last night on the Albanian coast — treat yourself', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Mon Jun 15', location: 'Himare → Tirana', emoji: '🚗',
+    activities: [
+      { time: 'Morning', name: 'One last swim', desc: 'Quick morning dip before the long drive north', tag: 'beach' },
+      { time: 'Midday', name: 'Drive Himare → Tirana', desc: '~3.5 hrs — scenic drive through the mountains. Stop at Llogara Pass viewpoint.', tag: 'travel' },
+      { time: 'Afternoon', name: 'Arrive Tirana, return rental car', desc: 'Drop car at TIA, check into Lot Boutique Hotel', tag: 'travel' },
+      { time: 'Evening', name: 'Blloku district dinner', desc: 'Tirana\'s trendiest neighbourhood, great restaurants, easy final evening', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Tue Jun 16', location: 'Tirana → Rome', emoji: '✈️',
+    activities: [
+      { time: 'Morning', name: 'Relaxed Tirana morning', desc: 'Skanderbeg Square walk, byrek breakfast, no rushing', tag: 'culture' },
+      { time: '12:30pm', name: 'Head to TIA airport', desc: '~20 min from city centre — return car if not done yesterday', tag: 'travel' },
+      { time: '2:40pm', name: 'Fly Tirana → Rome FCO', desc: 'Wizz Air W4 5015, 1hr 25min direct', tag: 'travel' },
+      { time: '4:05pm', name: 'Arrive Rome FCO', desc: 'Check in Hotel Ottaviano Augusto, Via Bernardino Telesio, Trionfale', tag: 'travel' },
+      { time: 'Evening', name: 'Last Roman dinner', desc: 'One final pasta, one final glass of wine', tag: 'food' },
+    ]
+  },
+  {
+    date: 'Wed Jun 17', location: 'Rome → New York', emoji: '🏠',
+    activities: [
+      { time: 'Morning', name: 'Final espresso in Rome', desc: 'Walk to the nearest bar, order like a local, soak it in', tag: 'food' },
+      { time: 'Afternoon', name: 'Head to Rome FCO', desc: 'Arrive airport by 5pm for 7:05pm departure', tag: 'travel' },
+      { time: '7:05pm', name: 'Depart Rome FCO → JFK', desc: 'Direct, 9hr 25min. Flight N0 401.', tag: 'travel' },
+      { time: '10:30pm', name: 'Land JFK', desc: 'Pre-book car service — World Cup gridlock alert night', tag: 'travel' },
+    ]
+  },
+];
+
+const tagClass = { beach: 'tag-beach', culture: 'tag-culture', nature: 'tag-nature', food: 'tag-food', travel: 'tag-travel' };
+
+function buildItinerary() {
+  const container = document.getElementById('itineraryTimeline');
+
+  days.forEach((day, i) => {
+    const isLast = i === days.length - 1;
+
+    // Find matching travel info for this day
+    const travel = travelDays.filter(t => t.date === day.date);
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;gap:16px;';
+
+    // Timeline column
+    const lineCol = document.createElement('div');
+    lineCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;';
+    lineCol.innerHTML = `
+      <div style="width:13px;height:13px;border-radius:50%;background:var(--clay);border:2px solid white;box-shadow:0 0 0 2px var(--clay);flex-shrink:0;margin-top:4px;"></div>
+      ${!isLast ? '<div style="width:2px;flex:1;background:linear-gradient(to bottom,var(--clay),rgba(196,149,106,0.15));margin:4px 0;min-height:40px;"></div>' : ''}
+    `;
+
+    // Content column
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;padding-bottom:24px;';
+
+    // Transport badges
+    const transportHTML = travel.map(t => `
+      <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;background:rgba(45,53,97,0.08);color:var(--slate);padding:3px 10px;border-radius:20px;margin-top:4px;margin-right:6px;font-weight:500;">${t.mode}</div>
+    `).join('');
+
+    // Activities HTML (hidden by default)
+    const activitiesHTML = day.activities.map(a => `
+      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
+        <div style="font-size:11px;color:var(--clay);font-weight:500;min-width:52px;padding-top:1px;">${a.time}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${a.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;">${a.desc}</div>
+          <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:4px;font-weight:500;" class="activity-tag ${tagClass[a.tag]}">${a.tag}</span>
+        </div>
+      </div>
+    `).join('');
+
+    content.innerHTML = `
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:2px;">${day.date}</div>
+      <div style="font-size:18px;font-weight:500;color:var(--deep);cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="toggleItinDay(this)">
+        <span>${day.emoji} ${day.location}</span>
+        <span style="font-size:11px;color:var(--muted);transition:transform 0.2s;" class="itin-chevron">▼</span>
+      </div>
+      ${transportHTML}
+      <div class="itin-activities" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:4px;">
+        ${activitiesHTML}
+      </div>
+    `;
+
+    wrapper.appendChild(lineCol);
+    wrapper.appendChild(content);
+    container.appendChild(wrapper);
+  });
+}
+
+function toggleItinDay(el) {
+  const content = el.parentElement;
+  const activities = content.querySelector('.itin-activities');
+  const chevron = el.querySelector('.itin-chevron');
+  if (!activities || !chevron) return;
+  const isOpen = activities.style.display !== 'none';
+  activities.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function toggleDay(header) {
+  header.parentElement.classList.toggle('open');
+}
+const travelDays = [
+  { date: 'Sat Jun 6', dest: 'New York → Rome', detail: 'JFK → FCO, departs 12:30am, arrives 2:30pm. Flight N0 402.', mode: '✈️ Direct · 8hrs' },
+  { date: 'Mon Jun 8', dest: 'Rome FCO → Tirana TIA', detail: 'Wizz Air W4 5012, departs 8:20am, arrives 9:55am. Pick up rental car.', mode: '✈️ Direct · 1hr 35min' },
+  { date: 'Mon Jun 8', dest: 'Tirana → Berat', detail: 'Drive straight south from TIA airport, skip Tirana entirely', mode: '🚗 Drive · ~1.5 hrs' },
+  { date: 'Wed Jun 10', dest: 'Berat Day Trip: Apollonia', detail: 'Drive to ancient Greek ruins, back to Berat for sunset', mode: '🚗 Day trip · ~1.5 hrs total driving' },
+  { date: 'Thu Jun 11', dest: 'Berat → Himare', detail: 'Drive south along the Albanian Riviera — stunning coastal road', mode: '🚗 Drive · ~2 hrs' },
+  { date: 'Fri Jun 12', dest: 'Himare Day Trip: Corfu 🇬🇷', detail: 'Ferry Himare → Corfu → Himare. Book Finikas Lines or Ionian Seaways in advance at omio.com. Bring passport.', mode: '⛴️ Ferry · ~1 hr each way' },
+  { date: 'Sat Jun 13', dest: 'Himare Day Trip: Dhermi + Gjipe Beach', detail: 'Drive north to Dhermi, canyon hike to Gjipe Beach, back to Himare', mode: '🚗 Day trip · ~1 hr total driving' },
+  { date: 'Sun Jun 14', dest: 'Himare Day Trip: Blue Eye + Butrint', detail: 'Drive south via Saranda to Blue Eye spring + Butrint UNESCO ruins', mode: '🚗 Day trip · ~2 hrs total driving' },
+  { date: 'Mon Jun 15', dest: 'Himare → Tirana', detail: 'Drive north via Llogara Pass — scenic mountain views. Return rental car at TIA.', mode: '🚗 Drive · ~3.5 hrs' },
+  { date: 'Tue Jun 16', dest: 'Tirana TIA → Rome FCO', detail: 'Wizz Air W4 5015, departs 2:40pm, arrives 4:05pm', mode: '✈️ Direct · 1hr 25min' },
+  { date: 'Wed Jun 17', dest: 'Rome → New York', detail: 'FCO → JFK, departs 7:05pm, arrives 10:30pm. Flight N0 401.', mode: '✈️ Direct · 9hrs 25min' },
+];
+
+function buildTravel() {
+  const container = document.getElementById('travelTimeline');
+  travelDays.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'travel-day';
+    div.innerHTML = `
+      <div class="travel-line">
+        <div class="travel-dot"></div>
+        ${i < travelDays.length - 1 ? '<div class="travel-connector"></div>' : ''}
+      </div>
+      <div class="travel-content">
+        <div class="travel-date">${t.date}</div>
+        <div class="travel-dest">${t.dest}</div>
+        <div class="travel-detail">${t.detail}</div>
+        <span class="travel-mode">${t.mode}</span>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// HOTELS
+const hotels = [
+  {
+    dates: 'Jun 6 – 8 (2 nights)',
+    city: 'Rome, Italy 🇮🇹',
+    name: '✅ Airbnb — Already Booked!',
+    price: '✅ $361.85 confirmed',
+    stats: ['Confirmed', 'Airbnb', 'Via di Sant Erasmo · Aventine Hill'],
+    backup: 'No backup needed — already confirmed',
+    link: 'https://www.airbnb.com/trips',
+    urgency: ''
+  },
+  {
+    dates: 'Jun 8 – 11 (3 nights)',
+    city: 'Berat, Albania 🇦🇱',
+    name: '🟡 Tomor Shehu Guest House — Tentatively Booked',
+    price: '€81 total · ~€27/night',
+    stats: ['Mangalem Quarter', 'Call to confirm: +355692806445', 'Rruga Antipatrea, Berat'],
+    backup: 'Hotel Colombo · Pool + spa, free breakfast, ~$89/night · booking.com',
+    link: 'https://www.booking.com/hotel/al/colombo-berat.html',
+    urgency: '⚡ Call to confirm booking — +355692806445'
+  },
+  {
+    dates: 'Jun 11 – 15 (4 nights)',
+    city: 'Himare, Albania 🇦🇱',
+    name: '🟡 Vourtaréa Guesthouse — Tentatively Booked',
+    price: '$289 total · ~$72/night',
+    stats: ['4 nights', 'Himare', 'Confirm booking'],
+    backup: 'Mediterranean Apartments · Beachfront, pool, sea view balcony, ~€92/night',
+    link: 'https://www.booking.com/searchresults.html?ss=Himare+Albania',
+    urgency: '⚡ Confirm booking asap — riviera fills fast'
+  },
+  {
+    dates: 'Jun 15 – 16 (1 night)',
+    city: 'Tirana, Albania 🇦🇱',
+    name: 'Lot Boutique Hotel',
+    price: '~$80-100/night',
+    stats: ['Boutique', 'Central', 'Near TIA airport'],
+    backup: 'Rogner Hotel Tirana · 4-star, spa, pool, rated 9.4, ~$120/night',
+    link: 'https://www.booking.com/hotel/al/lot-boutique-by-hotels-and-preference.html',
+    urgency: ''
+  },
+  {
+    dates: 'Jun 16 – 17 (1 night)',
+    city: 'Rome, Italy 🇮🇹',
+    name: 'Hotel Ottaviano Augusto',
+    price: '~$110-130/night',
+    stats: ['Transit night', '4a Via Bernardino Telesio', 'Trionfale'],
+    backup: 'Hotel Santa Maria Trastevere · Former convent, happy hour included',
+    link: 'https://www.booking.com/hotel/it/ottaviano-augusto-roma.html',
+    urgency: ''
+  },
+];
+
+let bookedHotels = new Set();
+
+function buildHotels() {
+  const container = document.getElementById('hotelCards');
+  hotels.forEach((h, i) => {
+    const card = document.createElement('div');
+    card.className = 'hotel-card';
+    card.innerHTML = `
+      <div class="hotel-booked" onclick="toggleBooked(this, ${i})" title="Mark as booked">○</div>
+      <div class="hotel-dates">${h.dates}</div>
+      <div class="hotel-city">${h.city}</div>
+      <div class="hotel-name">${h.name}</div>
+      <div class="hotel-price">Price: <span>${h.price}</span></div>
+      <div class="hotel-stats">${h.stats.map(s => `<span class="hotel-stat">${s}</span>`).join('')}</div>
+      ${h.urgency ? `<div class="urgency">${h.urgency}</div>` : ''}
+      <div class="hotel-backup"><strong>Backup:</strong> ${h.backup}</div>
+      <a href="${h.link}" target="_blank" class="book-btn">Book on Booking.com →</a>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleBooked(btn, index) {
+  if (bookedHotels.has(index)) {
+    bookedHotels.delete(index);
+    btn.classList.remove('booked');
+    btn.textContent = '○';
+  } else {
+    bookedHotels.add(index);
+    btn.classList.add('booked');
+    btn.textContent = '✓';
+  }
+  document.getElementById('bookedCount').textContent = bookedHotels.size + ' / ' + hotels.length;
+  saveState();
+}
+
+// PERSISTENCE
+function saveState() {
+  const checked = [];
+  document.querySelectorAll('.pack-item').forEach((el, i) => {
+    if (el.classList.contains('checked')) checked.push(i);
+  });
+  localStorage.setItem('albania_pack', JSON.stringify(checked));
+  localStorage.setItem('albania_hotels', JSON.stringify([...bookedHotels]));
+}
+
+function loadState() {
+  try {
+    const pack = JSON.parse(localStorage.getItem('albania_pack') || '[]');
+    const items = document.querySelectorAll('.pack-item');
+    pack.forEach(i => { if (items[i]) items[i].classList.add('checked'); });
+
+    const hotelsBooked = JSON.parse(localStorage.getItem('albania_hotels') || '[]');
+    hotelsBooked.forEach(i => {
+      bookedHotels.add(i);
+      const btns = document.querySelectorAll('.hotel-booked');
+      if (btns[i]) { btns[i].classList.add('booked'); btns[i].textContent = '✓'; }
+    });
+    document.getElementById('bookedCount').textContent = bookedHotels.size + ' / ' + hotels.length;
+  } catch(e) {}
+  updateProgress();
+}
+
+function copyItinerary() {
+  const text = document.getElementById('copyText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copied!';
+    btn.style.background = 'linear-gradient(135deg,#2e7d32,#388e3c)';
+    setTimeout(() => {
+      btn.textContent = '📋 Copy to Clipboard';
+      btn.style.background = 'linear-gradient(135deg,var(--slate),var(--deep))';
+    }, 2000);
+  });
+}
+
+buildItinerary();
+buildHotels();
+buildSummary();
+loadState();
+updateProgress();
+
+function buildSummary() {
+  const stops = [
+    { emoji: '✈️', dates: 'Jun 6–8', place: 'Rome 🇮🇹' },
+    { emoji: '✈️', dates: 'Jun 8', place: 'Fly Rome → Tirana' },
+    { emoji: '🏰', dates: 'Jun 8–11', place: 'Berat 🇦🇱' },
+    { emoji: '🌊', dates: 'Jun 11–15', place: 'Himare 🇦🇱' },
+    { emoji: '🏙️', dates: 'Jun 15–16', place: 'Tirana 🇦🇱' },
+    { emoji: '✈️', dates: 'Jun 16', place: 'Fly Tirana → Rome' },
+    { emoji: '🇮🇹', dates: 'Jun 16–17', place: 'Rome 🇮🇹' },
+    { emoji: '✈️', dates: 'Jun 17', place: 'Fly home to NYC' },
+  ];
+  const container = document.getElementById('summaryStops');
+  stops.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:8px 0;' + (i < stops.length - 1 ? 'border-bottom:1px solid rgba(255,255,255,0.08);' : '');
+    div.innerHTML = `
+      <span style="font-size:18px;width:24px;text-align:center;">${s.emoji}</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.5);min-width:72px;letter-spacing:0.5px;">${s.dates}</span>
+      <span style="font-size:14px;font-weight:500;color:white;">${s.place}</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+
+</script>
+</body>
+</html>
